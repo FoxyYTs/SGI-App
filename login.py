@@ -44,9 +44,9 @@ def recover(entry_correo):
         if resultado:
             token = f.generar_token_pass(correo)
             asunto = "Recuperar Contraseña"
-            url = "http://localhost/SGI-app/restablecer.php?user=" + resultado[1] + "&token=" + token
-            cuerpo = f"Hola {resultado[1]} <br /><br />Se ha solicitado un reinicio de contraseña <br/><br/>Para restaurar la contraseña visita la siguiente direccion: <a href='{url}'>Recuperar Contraseña</a>"
-            f.enviar_correo(correo, resultado[1], asunto, cuerpo)
+            url = "http://localhost/SGI-app/restablecer.php?user=" + resultado[0] + "&token=" + token
+            cuerpo = f"Hola {resultado[0]} <br /><br />Se ha solicitado un reinicio de contraseña <br/><br/>Para restaurar la contraseña visita la siguiente direccion: <a href='{url}'>Recuperar Contraseña</a>"
+            f.enviar_correo(correo, resultado[0], asunto, cuerpo)
             messagebox.showinfo("Token Enviado", "El token ha sido enviado al correo electrónica.")
         else:
             messagebox.showerror("Error", "El correo electrónica no se encuentra registrado.")

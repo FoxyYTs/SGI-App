@@ -6,7 +6,7 @@ def conectar():  # Nombre más descriptivo
             host="localhost",
             user="root",
             passwd="",
-            database="sgitest"
+            database="sgi"
         )
         return mydb
     except mysql.connector.Error as err:

@@ -56,8 +56,6 @@ def get_valor(campo, campo_where, valor):
         return resultado[0]
     else:
         return None
-    
-
 
 def enviar_correo(email, user, asunto, cuerpo):
 

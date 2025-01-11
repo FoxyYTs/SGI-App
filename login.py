@@ -3,8 +3,10 @@ from tkinter import messagebox
 import mysql.connector
 import re
 
+from menu import menu
 import conexion
 import funciones as f
+
 
 expRegPass = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,16}$'
 expRegCorreo = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -128,6 +130,7 @@ def login(entry_usuario, entry_clave):
         if resultado:
             messagebox.showinfo("Éxito", "Credenciales válidas.")
             ventana.destroy()
+            ejecutar = menu(usuario)
         else:
             messagebox.showerror("Error", "Credenciales inválidas.")
 

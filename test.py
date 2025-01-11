@@ -1,45 +1,35 @@
-import mysql.connector
+import tkinter as tk
 
-# Datos de conexión a la base de datos
-host = "localhost"
-user = "root"
-password = ""
-database = "sgi"
+# Crear la ventana principal
+ventana = tk.Tk()
+ventana.title("Mi Aplicación")
 
-try:
-    # Conectar a la base de datos
-    cnx = mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database
-    )
+# Crear el frame del encabezado
+encabezado = tk.Frame(ventana, bg="lightblue")
+encabezado.pack(fill="x")
 
-    # Crear un cursor
-    cursor = cnx.cursor()
+# Agregar el título
+titulo = tk.Label(encabezado, text="LAB MANAGER", font=("Arial", 16), fg="white")
+titulo.pack(side="left", padx=10)
 
-    # Parámetro para la consulta
-    nombre_usuario = "JoseDaza" 
+# Agregar los botones
+boton_buscar = tk.Button(encabezado, text="BUSCAR PRODUCTOS")
+boton_agregar = tk.Button(encabezado, text="AGREGAR PRODUCTOS")
+boton_generar = tk.Button(encabezado, text="GENERAR INFORME")
+# ... Agregar más botones ...
 
-    # Ejecutar la consulta
-    cursor.execute("SELECT a.user AS nombre_usuario, r.nombre_rol, p.nombre_permiso, p.archivo "
-                   "FROM acceso AS a "
-                   "JOIN roles AS r ON a.roles_fk = r.id_rol "
-                   "JOIN permiso_rol AS pr ON r.id_rol = pr.rol_fk "
-                   "JOIN permisos AS p ON p.id_permisos = pr.permiso_fk "
-                   "WHERE a.user = %s AND p.nombre_permiso NOT LIKE 'GESTION%'", (nombre_usuario,))
+boton_buscar.pack(side="left", padx=10)
+boton_agregar.pack(side="left", padx=10)
+boton_generar.pack(side="left", padx=10)
 
-    # Obtener los resultados
-    resultados = cursor.fetchall()
+# Agregar el menú desplegable (simplificado)
+menu_var = tk.StringVar(ventana)
+menu_var.set("INICIAR SESIÓN")
+menu = tk.OptionMenu(encabezado, menu_var, "INICIAR SESIÓN", "CERRAR SESIÓN")
+menu.pack(side="right", padx=10)
 
-    # Imprimir los resultados (opcional)
-    for resultado in resultados:
-        print(resultado)
+# Agregar el campo de búsqueda (simplificado)
+campo_busqueda = tk.Entry(encabezado)
+campo_busqueda.pack(side="right", padx=10)
 
-except mysql.connector.Error as error:
-    print(f"Error al conectar a MySQL: {error}")
-
-finally:
-    # Cerrar la conexión
-    if cnx:
-        cnx.close()
+ventana.mainloop()

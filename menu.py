@@ -1,12 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox
+import sys
 
 import mysql.connector
 
 import conexion
 
-class menu:
+from buscar_implementos import BuscarImplementos
+
+class Menu:
     def __init__(self, user):
+        self.verificar_user(user)
         self.ventana = tk.Tk()
         self.ventana.title("SGI LAB MANAGER")
         self.ventana.geometry("1280x720")
@@ -21,39 +25,59 @@ class menu:
         self.contenedor.pack(fill="both", expand=True)
 
         self.pestanas(user)
-
-        self.inicio()
+        Inicio(self.contenedor)
 
         self.center_window()
         self.ventana.mainloop()
 
+    def verificar_user(self, user):
+
+        if not user:
+            messagebox.showerror("Error", "Error con el usuario.")
+            sys.exit()
+
+        try:
+            mydb = conexion.conectar()
+            mycursor = mydb.cursor()
+
+            sql = "SELECT * FROM acceso WHERE user = %s"
+            val = (user,)
+            mycursor.execute(sql, val)
+            resultado = mycursor.fetchone()
+
+            if resultado:
+                return
+            else:
+                messagebox.showerror("Error", "Hubo un error con el usuario.")
+                sys.exit()
+
+        except mysql.connector.Error as err:
+            messagebox.showerror("Error", f"Error de conexión: {err}")
+        finally:
+            if mydb.is_connected():
+                mycursor.close()
+                mydb.close()
+
+    def cambio(self):
+        self.contenedor.forget()
+
+        self.contenedor = tk.Frame(self.ventana, bg="gray")
+        self.contenedor.pack(fill="both", expand=True)
+
     def center_window(self):
-        """
-        Centra la ventana en la pantalla.
-
-        Esta función actualiza las tareas inactivas de la ventana, calcula las coordenadas x e y para centrar la ventana y
-        establece la geometría de la ventana en consecuencia.
-
-        Parámetros:
-            self (objeto): La instancia de la clase.
-
-        Retorna:
-            Ninguno
-        """
         self.ventana.update_idletasks()
         x = (self.ventana.winfo_screenwidth() // 2) - (self.ventana.winfo_width() // 2)
         y = (self.ventana.winfo_screenheight() // 2) - (self.ventana.winfo_height() // 2)
         self.ventana.geometry(f'{self.ventana.winfo_width()}x{self.ventana.winfo_height()}+{x}+{y}')
 
     def click_handler(self, data):
-        print("asd")
-        self.frame.pack_forget()
+        self.cambio()
         if data == "INICIO":
-            self.inicio()
+            Inicio(self.contenedor)
         elif data == "BUSCAR IMPLEMENTOS":
-            self.buscar_implemento()
+            BuscarImplementos(self.contenedor)
         elif data == "AGREGAR IMPLEMENTOS":
-            self.agregar_implemento()
+            self.agregar_implementos()
         elif data == "GENERAR INFORME":
             self.generar_informe()
         elif data == "GESTIONAR ROLES":
@@ -68,9 +92,8 @@ class menu:
             self.gestionar_permisos()
         elif data == "GESTIONAR MOVIMIENTOS ADMINISTRADOR":
             self.gestionar_movimientos_administrador()
+    
     def pestanas(self, user):
-        
-            
         try:
             mydb = conexion.conectar()
             mycursor = mydb.cursor()
@@ -103,8 +126,11 @@ class menu:
                 dropdown = tk.OptionMenu(self.encabezado, variables, *opciones)
                 dropdown.pack(side="left", padx=10)
 
+                variables.trace("w", lambda *args: self.click_handler(variables.get()))
 
-            variables.trace("w", lambda *args: self.click_handler(variables.get()))
+            else:
+                messagebox.showerror("Error", "Credenciales inválidas.")
+
 
         except mysql.connector.Error as err:
             messagebox.showerror("Error", f"Error de conexión: {err}")
@@ -113,28 +139,10 @@ class menu:
                 mycursor.close()
                 mydb.close()
 
-    def inicio(self):
-        self.frame = tk.Frame(self.contenedor, bg="gray")
-        self.frame.pack(fill="both", expand=True)
-
-        label = tk.Label(self.frame, bg="gray")
-        label.place(relx=0.5, rely=0.5, anchor="center")
-
-        etiqueta = tk.Label(label, text="Bienvenido al SIG LAB MANAGER", font=("Arial", 16, "bold"), fg="blue", bg="gray")
-        etiqueta.grid(row=0, column=0, padx=10, pady=10)
-
-        etiqueta = tk.Label(label, text="WORK IN PROGRESS", font=("Arial", 16, "bold"), fg="blue", bg="gray")
-        etiqueta.grid(row=1, column=0, padx=10, pady=10)
-
-        etiqueta = tk.Label(label, text="¡Explora y disfruta de las funcionalidades del sistema!", font=("Arial", 16, "bold"), fg="blue", bg="gray")
-        etiqueta.grid(row=2, column=0, padx=10, pady=10)
-
-        print("asdasda")
-    
-    def buscar_implemento(self):
+    def buscar_implementos(self):
         print("Buscar Implemento")
     
-    def agregar_implemento(self):
+    def agregar_implementos(self):
         print("Registrar Implemento")
 
     def generar_informe(self):
@@ -158,4 +166,21 @@ class menu:
     def gestionar_movimientos_administrador(self):
         print("Gestionar Movimientos Administrador")
 
-menu("JoseDaza")
+class Inicio:
+    def __init__(self, contenedor):
+        self.frame = tk.Frame(contenedor, bg="gray")
+        self.frame.pack(fill="both", expand=True)
+
+        label = tk.Label(self.frame, bg="gray")
+        label.place(relx=0.5, rely=0.5, anchor="center")
+
+        etiqueta = tk.Label(label, text="Bienvenido al SIG LAB MANAGER", font=("Arial", 16, "bold"), fg="blue", bg="gray")
+        etiqueta.grid(row=0, column=0, padx=10, pady=10)
+
+        etiqueta = tk.Label(label, text="WORK IN PROGRESS", font=("Arial", 16, "bold"), fg="blue", bg="gray")
+        etiqueta.grid(row=1, column=0, padx=10, pady=10)
+
+        etiqueta = tk.Label(label, text="¡Explora y disfruta de las funcionalidades del sistema!", font=("Arial", 16, "bold"), fg="blue", bg="gray")
+        etiqueta.grid(row=2, column=0, padx=10, pady=10)
+
+Menu("JoseDaza")

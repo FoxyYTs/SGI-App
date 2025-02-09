@@ -3,7 +3,7 @@ from tkinter import messagebox
 import mysql.connector
 import re
 
-from menu import menu
+from menu import Menu
 import conexion
 import funciones as f
 
@@ -130,7 +130,7 @@ def login(entry_usuario, entry_clave):
         if resultado:
             messagebox.showinfo("Éxito", "Credenciales válidas.")
             ventana.destroy()
-            ejecutar = menu(usuario)
+            ejecutar = Menu(usuario)
         else:
             messagebox.showerror("Error", "Credenciales inválidas.")
 

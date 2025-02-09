@@ -1,35 +1,17 @@
 import tkinter as tk
 
-# Crear la ventana principal
-ventana = tk.Tk()
-ventana.title("Mi Aplicación")
+root = tk.Tk()
 
-# Crear el frame del encabezado
-encabezado = tk.Frame(ventana, bg="lightblue")
-encabezado.pack(fill="x")
+# Crear un marco para agrupar las etiquetas
+frame = tk.Frame(root)
+frame.pack()
 
-# Agregar el título
-titulo = tk.Label(encabezado, text="LAB MANAGER", font=("Arial", 16), fg="white")
-titulo.pack(side="left", padx=10)
+# Crear las etiquetas con el texto alineado a la izquierda
+label_id = tk.Label(frame, text="ID Implemento: 13", font=("Arial", 12), anchor="w")
+label_nombre = tk.Label(frame, text="Nombre Implemento: Balón de fondo plano de 100 ml", font=("Arial", 12), anchor="w")
 
-# Agregar los botones
-boton_buscar = tk.Button(encabezado, text="BUSCAR PRODUCTOS")
-boton_agregar = tk.Button(encabezado, text="AGREGAR PRODUCTOS")
-boton_generar = tk.Button(encabezado, text="GENERAR INFORME")
-# ... Agregar más botones ...
+# Empaquetar las etiquetas en el marco
+label_id.pack()
+label_nombre.pack()
 
-boton_buscar.pack(side="left", padx=10)
-boton_agregar.pack(side="left", padx=10)
-boton_generar.pack(side="left", padx=10)
-
-# Agregar el menú desplegable (simplificado)
-menu_var = tk.StringVar(ventana)
-menu_var.set("INICIAR SESIÓN")
-menu = tk.OptionMenu(encabezado, menu_var, "INICIAR SESIÓN", "CERRAR SESIÓN")
-menu.pack(side="right", padx=10)
-
-# Agregar el campo de búsqueda (simplificado)
-campo_busqueda = tk.Entry(encabezado)
-campo_busqueda.pack(side="right", padx=10)
-
-ventana.mainloop()
+root.mainloop()

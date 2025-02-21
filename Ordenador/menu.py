@@ -182,5 +182,3 @@ class Inicio:
 
         etiqueta = tk.Label(label, text="¡Explora y disfruta de las funcionalidades del sistema!", font=("Arial", 16, "bold"), fg="blue", bg="gray")
         etiqueta.grid(row=2, column=0, padx=10, pady=10)
-
-Menu("JoseDaza")

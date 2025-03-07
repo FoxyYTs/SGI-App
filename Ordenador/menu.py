@@ -8,6 +8,8 @@ import conexion
 
 from buscar_implementos import BuscarImplementos
 
+from agregar_implemento import AgregarImplemento
+
 class Menu:
     def __init__(self, user):
         self.verificar_user(user)
@@ -77,7 +79,7 @@ class Menu:
         elif data == "BUSCAR IMPLEMENTOS":
             BuscarImplementos(self.contenedor)
         elif data == "AGREGAR IMPLEMENTOS":
-            self.agregar_implementos()
+            AgregarImplemento(self.contenedor)
         elif data == "GENERAR INFORME":
             self.generar_informe()
         elif data == "GESTIONAR ROLES":
@@ -138,12 +140,6 @@ class Menu:
             if mydb.is_connected():
                 mycursor.close()
                 mydb.close()
-
-    def buscar_implementos(self):
-        print("Buscar Implemento")
-    
-    def agregar_implementos(self):
-        print("Registrar Implemento")
 
     def generar_informe(self):
         print("Generar Informe")

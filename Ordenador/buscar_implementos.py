@@ -79,8 +79,8 @@ class BuscarImplementos:
     def seleccionar_fila(self,event):
         item_seleccionado = self.tree.selection()[0]  # Obtener el ID de la fila seleccionada
         valores = self.tree.item(item_seleccionado, "values")  # Obtener los valores de la fila
-        self.id_implemento_label.config(text="ID Implemento: " + valores[0])
-        self.nombre_implemento_label.config(text="Nombre Implemento: " + valores[1])
+        self.id_implemento_label.config(text="ID Implemento\n" + valores[0])
+        self.nombre_implemento_label.config(text="Nombre Implemento\n" + valores[1])
         
 
     def search_function(self, event):

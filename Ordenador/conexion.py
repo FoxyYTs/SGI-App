@@ -3,7 +3,7 @@ import mysql.connector
 def conectar():  # Nombre más descriptivo
     try:
         mydb = mysql.connector.connect(
-            host="localhost",
+            host="172.22.85.242",
             user="root",
             passwd="",
             database="sgi"

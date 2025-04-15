@@ -1,50 +1,40 @@
+import tkinter as tk
+from tkinter import messagebox
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QFrame, QVBoxLayout, QHBoxLayout, QWidget, QMessageBox, QComboBox
-from PySide6.QtCore import Qt
+
 import mysql.connector
+
 import conexion
+
 from buscar_implementos import BuscarImplementos
 from agregar_implemento import AgregarImplemento
 
-class Menu(QMainWindow):
+class Menu:
     def __init__(self, user):
-        super().__init__()
-        self.user = user
         self.verificar_user(user)
-        self.initUI()
+        self.ventana = tk.Tk()
+        self.ventana.title("SGI LAB MANAGER")
+        self.ventana.geometry("1280x720")
+        
+        self.encabezado = tk.Frame(self.ventana, bg="white", )
+        self.encabezado.pack(fill="x")
+        
+        self.etiqueta = tk.Label(self.encabezado, text="LAB MANAGER", font=("Arial", 16, "bold"), fg="blue", bg="white")
+        self.etiqueta.pack(side="left", padx=10)
 
-    def initUI(self):
-        self.setWindowTitle("SGI LAB MANAGER")
-        self.setGeometry(0, 0, 1280, 720)
+        self.contenedor = tk.Frame(self.ventana, bg="gray")
+        self.contenedor.pack(fill="both", expand=True)
 
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-
-        self.layout = QVBoxLayout(self.central_widget)
-
-        self.encabezado = QFrame()
-        self.encabezado.setStyleSheet("background-color: white;")
-        self.layout.addWidget(self.encabezado)
-
-        self.encabezado_layout = QHBoxLayout(self.encabezado)
-
-        self.etiqueta = QLabel("LAB MANAGER", self.encabezado)
-        self.etiqueta.setStyleSheet("font: bold 16px Arial; color: blue;")
-        self.encabezado_layout.addWidget(self.etiqueta)
-
-        self.contenedor = QFrame()
-        self.contenedor.setStyleSheet("background-color: gray;")
-        self.layout.addWidget(self.contenedor)
-
-        self.pestanas(self.user)
-        self.inicio = Inicio(self.contenedor)
+        self.pestanas(user)
+        Inicio(self.contenedor)
 
         self.center_window()
-        self.show()
+        self.ventana.mainloop()
 
     def verificar_user(self, user):
+
         if not user:
-            QMessageBox.critical(self, "Error", "Error con el usuario.")
+            messagebox.showerror("Error", "Error con el usuario.")
             sys.exit()
 
         try:
@@ -56,35 +46,39 @@ class Menu(QMainWindow):
             mycursor.execute(sql, val)
             resultado = mycursor.fetchone()
 
-            if not resultado:
-                QMessageBox.critical(self, "Error", "Hubo un error con el usuario.")
+            if resultado:
+                return
+            else:
+                messagebox.showerror("Error", "Hubo un error con el usuario.")
                 sys.exit()
 
         except mysql.connector.Error as err:
-            QMessageBox.critical(self, "Error", f"Error de conexión: {err}")
+            messagebox.showerror("Error", f"Error de conexión: {err}")
         finally:
             if mydb.is_connected():
                 mycursor.close()
                 mydb.close()
 
     def cambio(self):
-        for i in reversed(range(self.contenedor.layout().count())):
-            self.contenedor.layout().itemAt(i).widget().setParent(None)
+        self.contenedor.forget()
+
+        self.contenedor = tk.Frame(self.ventana, bg="gray")
+        self.contenedor.pack(fill="both", expand=True)
 
     def center_window(self):
-        frame_geometry = self.frameGeometry()
-        center_point = self.screen().availableGeometry().center()
-        frame_geometry.moveCenter(center_point)
-        self.move(frame_geometry.topLeft())
+        self.ventana.update_idletasks()
+        x = (self.ventana.winfo_screenwidth() // 2) - (self.ventana.winfo_width() // 2)
+        y = (self.ventana.winfo_screenheight() // 2) - (self.ventana.winfo_height() // 2)
+        self.ventana.geometry(f'{self.ventana.winfo_width()}x{self.ventana.winfo_height()}+{x}+{y}')
 
     def click_handler(self, data):
         self.cambio()
         if data == "INICIO":
-            self.inicio = Inicio(self.contenedor)
+            Inicio(self.contenedor)
         elif data == "BUSCAR IMPLEMENTOS":
-            self.buscar_implementos = BuscarImplementos(self.contenedor)
+            BuscarImplementos(self.contenedor)
         elif data == "AGREGAR IMPLEMENTOS":
-            self.agregar_implemento = AgregarImplemento(self.contenedor)
+            AgregarImplemento(self.contenedor)
         elif data == "GENERAR INFORME":
             self.generar_informe()
         elif data == "GESTIONAR ROLES":
@@ -99,7 +93,7 @@ class Menu(QMainWindow):
             self.gestionar_permisos()
         elif data == "GESTIONAR MOVIMIENTOS ADMINISTRADOR":
             self.gestionar_movimientos_administrador()
-
+    
     def pestanas(self, user):
         try:
             mydb = conexion.conectar()
@@ -112,58 +106,82 @@ class Menu(QMainWindow):
 
             if resultado:
                 for i in resultado:
-                    label = QLabel(i[2], self.encabezado)
-                    label.setStyleSheet("font: 12px Arial; color: black; cursor: pointer;")
-                    label.mousePressEvent = lambda event, data=i[2]: self.click_handler(data)
-                    self.encabezado_layout.addWidget(label)
+                    label = tk.Label(self.encabezado, text=i[2], font=("Arial", 12), cursor="hand2", bg="white")
+                    label.bind("<Button-1>", lambda event, data=i[2]: self.click_handler(data))
+                    
+                    label.pack(side="left", padx=10)
             else:
-                QMessageBox.critical(self, "Error", "Credenciales inválidas.")
+                messagebox.showerror("Error", "Credenciales inválidas.")
 
-            sql = "SELECT a.user AS nombre_usuario, r.nombre_rol, p.nombre_permiso, p.archivo FROM acceso AS a JOIN roles AS r ON a.roles_fk = r.id_rol JOIN permiso_rol AS pr ON r.id_rol = pr.rol_fk JOIN permisos AS p ON p.id_permisos = pr.permiso_fk WHERE a.user = %s AND p.nombre_permiso LIKE 'GESTION%'"
+            sql = sql = "SELECT a.user AS nombre_usuario, r.nombre_rol, p.nombre_permiso, p.archivo FROM acceso AS a JOIN roles AS r ON a.roles_fk = r.id_rol JOIN permiso_rol AS pr ON r.id_rol = pr.rol_fk JOIN permisos AS p ON p.id_permisos = pr.permiso_fk WHERE a.user = %s AND p.nombre_permiso LIKE 'GESTION%'"
             mycursor.execute(sql, val)
             resultado = mycursor.fetchall()
 
             if resultado:
-                opciones = [i[2] for i in resultado]
-                self.dropdown = QComboBox(self.encabezado)
-                self.dropdown.addItems(opciones)
-                self.dropdown.setCurrentText("GESTIONAR")
-                self.dropdown.currentTextChanged.connect(self.click_handler)
-                self.encabezado_layout.addWidget(self.dropdown)
+                opciones = []
+                for i in resultado:
+                    opciones.append(i[2])
+                variables = tk.StringVar(self.encabezado)
+                variables.set("GESTIONAR")
+
+                dropdown = tk.OptionMenu(self.encabezado, variables, *opciones)
+                dropdown.pack(side="left", padx=10)
+
+                variables.trace("w", lambda *args: self.click_handler(variables.get()))
+
             else:
-                QMessageBox.critical(self, "Error", "Credenciales inválidas.")
+                messagebox.showerror("Error", "Credenciales inválidas.")
+
 
         except mysql.connector.Error as err:
-            QMessageBox.critical(self, "Error", f"Error de conexión: {err}")
+            messagebox.showerror("Error", f"Error de conexión: {err}")
         finally:
             if mydb.is_connected():
                 mycursor.close()
                 mydb.close()
 
-class Inicio(QFrame):
+    def buscar_implementos(self):
+        print("Buscar Implemento")
+    
+    def agregar_implementos(self):
+        print("Registrar Implemento")
+
+    def generar_informe(self):
+        print("Generar Informe")
+
+    def gestionar_roles(self):
+        print("Gestionar Roles")
+
+    def gestionar_implementos(self):
+        print("Gestionar Implementos")
+
+    def gestionar_movimientos(self):
+        print("Gestionar Movimientos")
+
+    def gestionar_tablas_maestras(self):
+        print("Gestionar Tablas Maestras")
+
+    def gestionar_permisos(self):
+        print("Gestionar Permisos")
+
+    def gestionar_movimientos_administrador(self):
+        print("Gestionar Movimientos Administrador")
+
+class Inicio:
     def __init__(self, contenedor):
-        super().__init__(contenedor)
-        self.setStyleSheet("background-color: gray;")
-        self.layout = QVBoxLayout(self)
+        self.frame = tk.Frame(contenedor, bg="gray")
+        self.frame.pack(fill="both", expand=True)
 
-        label = QLabel(self)
-        label.setStyleSheet("background-color: gray;")
-        self.layout.addWidget(label, alignment=Qt.AlignCenter)
+        label = tk.Label(self.frame, bg="gray")
+        label.place(relx=0.5, rely=0.5, anchor="center")
 
-        etiqueta = QLabel("Bienvenido al SIG LAB MANAGER", label)
-        etiqueta.setStyleSheet("font: bold 16px Arial; color: blue;")
-        self.layout.addWidget(etiqueta, alignment=Qt.AlignCenter)
+        etiqueta = tk.Label(label, text="Bienvenido al SIG LAB MANAGER", font=("Arial", 16, "bold"), fg="blue", bg="gray")
+        etiqueta.grid(row=0, column=0, padx=10, pady=10)
 
-        etiqueta = QLabel("WORK IN PROGRESS", label)
-        etiqueta.setStyleSheet("font: bold 16px Arial; color: blue;")
-        self.layout.addWidget(etiqueta, alignment=Qt.AlignCenter)
+        etiqueta = tk.Label(label, text="WORK IN PROGRESS", font=("Arial", 16, "bold"), fg="blue", bg="gray")
+        etiqueta.grid(row=1, column=0, padx=10, pady=10)
 
-        etiqueta = QLabel("¡Explora y disfruta de las funcionalidades del sistema!", label)
-        etiqueta.setStyleSheet("font: bold 16px Arial; color: blue;")
-        self.layout.addWidget(etiqueta, alignment=Qt.AlignCenter)
+        etiqueta = tk.Label(label, text="¡Explora y disfruta de las funcionalidades del sistema!", font=("Arial", 16, "bold"), fg="blue", bg="gray")
+        etiqueta.grid(row=2, column=0, padx=10, pady=10)
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    user = "JoseDaza"  # Cambia esto por el usuario real
-    menu = Menu(user)
-    sys.exit(app.exec())
+Menu("JoseDaza")

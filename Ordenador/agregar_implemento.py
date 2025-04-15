@@ -1,95 +1,163 @@
-from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QMessageBox
+import tkinter as tk
+from tkinter import ttk, messagebox
 import mysql.connector
 import conexion
 
-class AgregarImplemento(QWidget):
+class AgregarImplemento:
     def __init__(self, contenedor):
-        super().__init__(contenedor)
-        self.initUI()
+        self.frame = tk.Frame(contenedor, bg="#D3D3D3")
+        self.frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-    def initUI(self):
-        self.setStyleSheet("background-color: gray;")
-        layout = QVBoxLayout(self)
+        # Título
+        titulo = tk.Label(self.frame, text="Registro de Implemento", font=("Arial", 16, "bold"), 
+                         fg="blue", bg="#D3D3D3")
+        titulo.grid(row=0, column=0, columnspan=2, pady=(0, 20))
 
-        label_agregar = QLabel("Agregar Implemento", self)
-        label_agregar.setStyleSheet("font: bold 16px; color: blue;")
-        layout.addWidget(label_agregar)
+        # Formulario
+        self.crear_formulario()
 
-        nombre = QWidget(self)
-        nombre_layout = QVBoxLayout(nombre)
-        label_nombre = QLabel("Nombre del implemento:", nombre)
-        nombre_layout.addWidget(label_nombre)
-        self.entry_nombre = QLineEdit(nombre)
-        nombre_layout.addWidget(self.entry_nombre)
-        layout.addWidget(nombre)
+        # Botón de registro
+        btn_registrar = tk.Button(self.frame, text="Registrar", command=self.registrar_implemento,
+                                 bg="#007bff", fg="white", font=("Arial", 12))
+        btn_registrar.grid(row=8, column=0, columnspan=2, pady=20)
 
-        stock = QWidget(self)
-        stock_layout = QVBoxLayout(stock)
-        label_stock = QLabel("Stock:", stock)
-        stock_layout.addWidget(label_stock)
-        self.entry_stock = QLineEdit(stock)
-        stock_layout.addWidget(self.entry_stock)
-        layout.addWidget(stock)
+        # Cargar opciones de combobox
+        self.cargar_ubicaciones()
+        self.cargar_unidades_medida()
 
-        ubicacion = QWidget(self)
-        ubicacion_layout = QVBoxLayout(ubicacion)
-        label_ubicacion = QLabel("Ubicacion:", ubicacion)
-        ubicacion_layout.addWidget(label_ubicacion)
-        self.combo_ubicacion = QComboBox(ubicacion)
-        self.combo_ubicacion.addItems(["Ubicacion 1", "Ubicacion 2", "Ubicacion 3"])
-        ubicacion_layout.addWidget(self.combo_ubicacion)
-        layout.addWidget(ubicacion)
+    def crear_formulario(self):
+        # Nombre del implemento
+        tk.Label(self.frame, text="Nombre del implemento:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        self.nombre_implemento = tk.Entry(self.frame, font=("Arial", 10))
+        self.nombre_implemento.grid(row=1, column=1, sticky="ew", padx=10, pady=5)
 
-        unidad_medida = QWidget(self)
-        unidad_medida_layout = QVBoxLayout(unidad_medida)
-        label_unidad_medida = QLabel("Unidad de Medida:", unidad_medida)
-        unidad_medida_layout.addWidget(label_unidad_medida)
-        self.combo_unidad_medida = QComboBox(unidad_medida)
-        self.combo_unidad_medida.addItems(["Unidad 1", "Unidad 2", "Unidad 3"])
-        unidad_medida_layout.addWidget(self.combo_unidad_medida)
-        layout.addWidget(unidad_medida)
+        # Stock
+        tk.Label(self.frame, text="Stock:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=2, column=0, sticky="w", padx=10, pady=5)
+        self.stock = tk.Entry(self.frame, font=("Arial", 10))
+        self.stock.grid(row=2, column=1, sticky="ew", padx=10, pady=5)
 
-        tecnica = QWidget(self)
-        tecnica_layout = QVBoxLayout(tecnica)
-        label_tecnica = QLabel("Tecnica:", tecnica)
-        tecnica_layout.addWidget(label_tecnica)
-        self.entry_tecnica = QLineEdit(tecnica)
-        tecnica_layout.addWidget(self.entry_tecnica)
-        layout.addWidget(tecnica)
+        # Stock mínimo
+        tk.Label(self.frame, text="Stock mínimo:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        self.stock_minimo = tk.Entry(self.frame, font=("Arial", 10))
+        self.stock_minimo.grid(row=3, column=1, sticky="ew", padx=10, pady=5)
 
-        guia_uso = QWidget(self)
-        guia_uso_layout = QVBoxLayout(guia_uso)
-        label_guia_uso = QLabel("Guia de Uso:", guia_uso)
-        guia_uso_layout.addWidget(label_guia_uso)
-        self.text_guia_uso = QLineEdit(guia_uso)
-        guia_uso_layout.addWidget(self.text_guia_uso)
-        layout.addWidget(guia_uso)
+        # Foto
+        tk.Label(self.frame, text="Enlace a Foto del implemento:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=4, column=0, sticky="w", padx=10, pady=5)
+        self.foto = tk.Entry(self.frame, font=("Arial", 10))
+        self.foto.grid(row=4, column=1, sticky="ew", padx=10, pady=5)
 
-        button_registrar = QPushButton("Registrar", self)
-        button_registrar.clicked.connect(self.registrar)
-        layout.addWidget(button_registrar)
+        # Ubicación (Combobox)
+        tk.Label(self.frame, text="Ubicación:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=5, column=0, sticky="w", padx=10, pady=5)
+        self.ubicacion = ttk.Combobox(self.frame, font=("Arial", 10), state="readonly")
+        self.ubicacion.grid(row=5, column=1, sticky="ew", padx=10, pady=5)
 
-        self.consulta()
+        # Unidad de medida (Combobox)
+        tk.Label(self.frame, text="Unidad de Medida:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=6, column=0, sticky="w", padx=10, pady=5)
+        self.unidad_medida = ttk.Combobox(self.frame, font=("Arial", 10), state="readonly")
+        self.unidad_medida.grid(row=6, column=1, sticky="ew", padx=10, pady=5)
 
-    def consulta(self):
+        # Ficha técnica
+        tk.Label(self.frame, text="Ficha técnica:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=7, column=0, sticky="w", padx=10, pady=5)
+        self.ficha_tecnica = tk.Entry(self.frame, font=("Arial", 10))
+        self.ficha_tecnica.grid(row=7, column=1, sticky="ew", padx=10, pady=5)
+
+        # Guía de uso
+        tk.Label(self.frame, text="Guía de Uso:", bg="#D3D3D3", 
+                font=("Arial", 10)).grid(row=8, column=0, sticky="w", padx=10, pady=5)
+        self.guia_uso = tk.Entry(self.frame, font=("Arial", 10))
+        self.guia_uso.grid(row=8, column=1, sticky="ew", padx=10, pady=5)
+
+    def cargar_ubicaciones(self):
+        try:
+            mydb = conexion.conectar()
+            mycursor = mydb.cursor()
+            mycursor.execute("SELECT id_ubicacion FROM ubicacion ORDER BY id_ubicacion ASC")
+            ubicaciones = [str(row[0]) for row in mycursor.fetchall()]
+            self.ubicacion['values'] = ubicaciones
+        except mysql.connector.Error as err:
+            messagebox.showerror("Error", f"Error al cargar ubicaciones: {err}")
+        finally:
+            if 'mydb' in locals() and mydb.is_connected():
+                mycursor.close()
+                mydb.close()
+
+    def cargar_unidades_medida(self):
+        try:
+            mydb = conexion.conectar()
+            mycursor = mydb.cursor()
+            mycursor.execute("SELECT id_medida, nombre_medida FROM unidad_medida ORDER BY id_medida ASC")
+            unidades = [f"{row[0]} - {row[1]}" for row in mycursor.fetchall()]
+            self.unidad_medida['values'] = unidades
+        except mysql.connector.Error as err:
+            messagebox.showerror("Error", f"Error al cargar unidades de medida: {err}")
+        finally:
+            if 'mydb' in locals() and mydb.is_connected():
+                mycursor.close()
+                mydb.close()
+
+    def registrar_implemento(self):
+        # Obtener valores del formulario
+        nombre = self.nombre_implemento.get()
+        stock = self.stock.get()
+        stock_min = self.stock_minimo.get()
+        foto = self.foto.get()
+        ubicacion = self.ubicacion.get().split()[0]  # Obtener solo el ID
+        unidad_medida = self.unidad_medida.get().split()[0]  # Obtener solo el ID
+        ficha_tecnica = self.ficha_tecnica.get()
+        guia_uso = self.guia_uso.get()
+
+        # Validaciones básicas
+        if not nombre:
+            messagebox.showerror("Error", "El nombre del implemento es requerido")
+            return
+
         try:
             mydb = conexion.conectar()
             mycursor = mydb.cursor()
 
-            sql = "SELECT * FROM implemento JOIN unidad_medida ON unidad_medida.id_medida=implemento.und_medida_fk ORDER BY id_implemento ASC"
-            mycursor.execute(sql)
-            self.resultado = mycursor.fetchall()
+            sql = """INSERT INTO implemento 
+                    (nombre_implemento, stock_implemento, stock_minimo, ficha_tecnica, 
+                     foto, guia_uso_lab, ubicacion_fk, und_medida_fk) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
+            
+            valores = (
+                nombre,
+                int(stock) if stock else None,
+                int(stock_min) if stock_min else None,
+                ficha_tecnica if ficha_tecnica else None,
+                foto if foto else None,
+                guia_uso if guia_uso else None,
+                ubicacion if ubicacion else None,
+                int(unidad_medida) if unidad_medida else None
+            )
 
-            if not self.resultado:
-                QMessageBox.critical(self, "Error", "Credenciales inválidas.")
+            mycursor.execute(sql, valores)
+            mydb.commit()
+
+            messagebox.showinfo("Éxito", "Implemento registrado correctamente")
+            self.limpiar_formulario()
 
         except mysql.connector.Error as err:
-            QMessageBox.critical(self, "Error", f"Error de conexión: {err}")
+            mydb.rollback()
+            messagebox.showerror("Error", f"Error al registrar implemento: {err}")
         finally:
-            if mydb.is_connected():
+            if 'mydb' in locals() and mydb.is_connected():
                 mycursor.close()
                 mydb.close()
 
-    def registrar(self):
-        # Aquí puedes agregar la lógica para registrar el implemento
-        pass
+    def limpiar_formulario(self):
+        self.nombre_implemento.delete(0, tk.END)
+        self.stock.delete(0, tk.END)
+        self.stock_minimo.delete(0, tk.END)
+        self.foto.delete(0, tk.END)
+        self.ubicacion.set('')
+        self.unidad_medida.set('')
+        self.ficha_tecnica.delete(0, tk.END)
+        self.guia_uso.delete(0, tk.END)

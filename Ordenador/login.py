@@ -1,253 +1,273 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox
-from PySide6.QtCore import Qt
+import tkinter as tk
+from tkinter import messagebox
 import mysql.connector
 import re
+
 from menu import Menu
 import conexion
 import funciones as f
 
+
 expRegPass = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,16}$'
 expRegCorreo = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Inicio de Sesión")
-        self.interfaz_inicio()
+ventana = tk.Tk()
 
-    def comprobar_campo(self, tipo, campo_1, campo_2=None, campo_3=None, campo_4=None):
-        if tipo == "login" and (not campo_1 or not campo_2):
-            QMessageBox.critical(self, "Error", "Por favor, ingrese usuario y contraseña.")
-            return True
-        if tipo == "register" and (not campo_1 or not campo_2 or not campo_3 or not campo_4):
-            QMessageBox.critical(self, "Error", "Por favor, complete todos los campos.")
-            return True
-        if tipo == "recover" and (not campo_1):
-            QMessageBox.critical(self, "Error", "Por favor, ingrese un correo electrónico.")
-            return True
+def comprobar_campo(tipo, campo_1, campo_2 = None, campo_3 = None, campo_4 = None):
+    if tipo == "login" and (not campo_1 or not campo_2):
+        messagebox.showerror("Error", "Por favor, ingrese usuario y contraseña.")
+        return True
+    if tipo == "register" and (not campo_1 or not campo_2 or not campo_3 or not campo_4):
+        messagebox.showerror("Error", "Por favor, complete todos los campos.")
+        return True
+    if tipo == "recover" and (not campo_1):
+        messagebox.showerror("Error", "Por favor, ingrese un correo electrónico.")
+        return True
 
-    def recover(self, entry_correo):
-        correo = entry_correo.text()
+def recover(entry_correo):
+    correo = entry_correo.get()
 
-        if self.comprobar_campo("recover", correo):
-            return
-        if not re.match(expRegCorreo, correo):
-            QMessageBox.critical(self, "Error", "El correo electrónico no es válido.")
-            return
+    if comprobar_campo("recover", correo):
+        return
+    if not re.match(expRegCorreo, correo):
+        messagebox.showerror("Error", "El correo electrónica no es válido.")
+        return
 
-        try:
-            mydb = conexion.conectar()
-            mycursor = mydb.cursor()
+    try:
+        mydb = conexion.conectar()
+        mycursor = mydb.cursor()
 
-            sql = "SELECT * FROM acceso WHERE email = %s"
-            val = (correo,)
-            mycursor.execute(sql, val)
-            resultado = mycursor.fetchone()
-            print(resultado)
+        sql = "SELECT * FROM acceso WHERE email = %s"
+        val = (correo,)
+        mycursor.execute(sql, val)
+        resultado = mycursor.fetchone()
+        print(resultado)
 
-            if resultado:
-                token = f.generar_token_pass(correo)
-                asunto = "Recuperar Contraseña"
-                url = "http://localhost/SGI-app/restablecer.php?user=" + resultado[0] + "&token=" + token
-                cuerpo = f"Hola {resultado[0]} <br /><br />Se ha solicitado un reinicio de contraseña <br/><br/>Para restaurar la contraseña visita la siguiente dirección: <a href='{url}'>Recuperar Contraseña</a>"
-                f.enviar_correo(correo, resultado[0], asunto, cuerpo)
-                QMessageBox.information(self, "Token Enviado", "El token ha sido enviado al correo electrónico.")
-            else:
-                QMessageBox.critical(self, "Error", "El correo electrónico no se encuentra registrado.")
+        if resultado:
+            token = f.generar_token_pass(correo)
+            asunto = "Recuperar Contraseña"
+            url = "http://localhost/SGI-app/restablecer.php?user=" + resultado[0] + "&token=" + token
+            cuerpo = f"Hola {resultado[0]} <br /><br />Se ha solicitado un reinicio de contraseña <br/><br/>Para restaurar la contraseña visita la siguiente direccion: <a href='{url}'>Recuperar Contraseña</a>"
+            f.enviar_correo(correo, resultado[0], asunto, cuerpo)
+            messagebox.showinfo("Token Enviado", "El token ha sido enviado al correo electrónica.")
+        else:
+            messagebox.showerror("Error", "El correo electrónica no se encuentra registrado.")
 
-        except mysql.connector.Error as err:
-            QMessageBox.critical(self, "Error", f"Error de conexión: {err}")
-        finally:
-            if mydb.is_connected():
-                mycursor.close()
-                mydb.close()
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error de conexión: {err}")
+    finally:
+        if mydb.is_connected():
+            mycursor.close()
+            mydb.close()
+            
+def register(entry_correo, entry_usuario, entry_clave, entry_con_clave):
+    correo = entry_correo.get()
+    usuario = entry_usuario.get()
+    clave = entry_clave.get()
+    con_clave = entry_con_clave.get()
 
-    def register(self, entry_correo, entry_usuario, entry_clave, entry_con_clave):
-        correo = entry_correo.text()
-        usuario = entry_usuario.text()
-        clave = entry_clave.text()
-        con_clave = entry_con_clave.text()
+    if comprobar_campo("register",usuario, clave, correo, con_clave):
+        return
+    if not re.match(expRegCorreo, correo):
+        messagebox.showerror("Error", "El correo electrónica no es válido.")
+        return
+    if not re.match(expRegPass, clave):
+        messagebox.showerror("Error", "La contraseña no es válida.")
+        return
+    if con_clave != clave:
+        messagebox.showerror("Error", "Las contraseñas no coinciden.")
+        return
 
-        if self.comprobar_campo("register", usuario, clave, correo, con_clave):
-            return
-        if not re.match(expRegCorreo, correo):
-            QMessageBox.critical(self, "Error", "El correo electrónico no es válido.")
-            return
-        if not re.match(expRegPass, clave):
-            QMessageBox.critical(self, "Error", "La contraseña no es válida.")
-            return
-        if con_clave != clave:
-            QMessageBox.critical(self, "Error", "Las contraseñas no coinciden.")
-            return
+    pass_encriptada = f.encriptar_clave(clave)
 
-        pass_encriptada = f.encriptar_clave(clave)
+    try:
+        mydb = conexion.conectar()
+        mycursor = mydb.cursor()
 
-        try:
-            mydb = conexion.conectar()
-            mycursor = mydb.cursor()
+        sql = "SELECT * FROM acceso WHERE user = %s OR email = %s"
+        val = (usuario, correo)
+        mycursor.execute(sql, val)
+        resultado = mycursor.fetchone()
 
-            sql = "SELECT * FROM acceso WHERE user = %s OR email = %s"
-            val = (usuario, correo)
-            mycursor.execute(sql, val)
-            resultado = mycursor.fetchone()
-
-            if resultado:
-                QMessageBox.critical(self, "Error", "El usuario o correo electrónico ya existen.")
-                return
-
-            sql = "INSERT INTO acceso (email, user, pass) VALUES (%s, %s, %s)"
-            val = (correo, usuario, pass_encriptada)
-            mycursor.execute(sql, val)
-            mydb.commit()
-
-            QMessageBox.information(self, "Éxito", "Usuario registrado correctamente.")
-            self.interfaz_inicio()
-
-        except mysql.connector.Error as err:
-            QMessageBox.critical(self, "Error", f"Error de conexión: {err}")
-        finally:
-            if mydb.is_connected():
-                mycursor.close()
-                mydb.close()
-
-    def login(self, entry_usuario, entry_clave):
-        usuario = entry_usuario.text()
-        clave = entry_clave.text()
-
-        if self.comprobar_campo("login", usuario, clave):
+        if resultado:
+            messagebox.showerror("Error", "El usuario o correo electrónica ya existen.")
             return
 
-        clave = f.encriptar_clave(clave)
+        sql = "INSERT INTO acceso (email, user, pass) VALUES (%s, %s, %s)"
+        val = (correo, usuario, pass_encriptada)
+        mycursor.execute(sql, val)
+        mydb.commit()
 
-        try:
-            mydb = conexion.conectar()
-            mycursor = mydb.cursor()
-            sql = "SELECT * FROM acceso WHERE user = %s AND pass = %s"
-            val = (usuario, clave)
-            mycursor.execute(sql, val)
-            resultado = mycursor.fetchone()
+        messagebox.showinfo("Éxito", "Usuario registrado correctamente.")
+        registro = True
 
-            if resultado:
-                QMessageBox.information(self, "Éxito", "Credenciales válidas.")
-                self.close()
-                ejecutar = Menu(usuario)
-            else:
-                QMessageBox.critical(self, "Error", "Credenciales inválidas.")
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error de conexión: {err}")
+    finally:
+        if mydb.is_connected():
+            mycursor.close()
+            mydb.close()
+            return registro
 
-        except mysql.connector.Error as err:
-            QMessageBox.critical(self, "Error", f"Error de conexión: {err}")
-        finally:
-            if mydb.is_connected():
-                mycursor.close()
-                mydb.close()
+def login(entry_usuario, entry_clave):
+    usuario = entry_usuario.get()
+    clave = entry_clave.get()
 
-    def interfaz_recuperar(self):
-        self.clear_layout()
+    if comprobar_campo("login",usuario, clave):
+        return
+    
+    clave = f.encriptar_clave(clave)
 
-        layout = QVBoxLayout()
+    try:
+        mydb = conexion.conectar()
 
-        label_correo = QLabel("Correo:")
-        self.entry_correo = QLineEdit()
-        layout.addWidget(label_correo)
-        layout.addWidget(self.entry_correo)
+        mycursor = mydb.cursor()
+        sql = "SELECT * FROM acceso WHERE user = %s AND pass = %s"
+        val = (usuario, clave)
+        mycursor.execute(sql, val)
+        resultado = mycursor.fetchone()
 
-        boton_login = QPushButton("Iniciar Sesión")
-        boton_login.clicked.connect(self.interfaz_inicio)
-        layout.addWidget(boton_login)
+        if resultado:
+            messagebox.showinfo("Éxito", "Credenciales válidas.")
+            ventana.destroy()
+            ejecutar = Menu(usuario)
+        else:
+            messagebox.showerror("Error", "Credenciales inválidas.")
 
-        boton_regis = QPushButton("Registrar Usuario")
-        boton_regis.clicked.connect(self.interfaz_registro)
-        layout.addWidget(boton_regis)
+    except mysql.connector.Error as err:
+        messagebox.showerror("Error", f"Error de conexión: {err}")
+    finally:
+        if mydb.is_connected():
+            mycursor.close()
+            mydb.close()
 
-        boton_forget = QPushButton("Recuperar Contraseña")
-        boton_forget.clicked.connect(lambda: self.recover(self.entry_correo))
-        layout.addWidget(boton_forget)
+def interfaz_recuperar():
+    def inicio():
+        frame_recuperar.pack_forget()
+        interfaz_inicio()
 
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+    def registro():
+        frame_recuperar.pack_forget()
+        interfaz_registro()
 
-    def interfaz_registro(self):
-        self.clear_layout()
+    def recuperar():
+        recover(entry_correo)
+        frame_recuperar.pack_forget()
+        interfaz_recuperar()
 
-        layout = QVBoxLayout()
+    frame_recuperar = tk.Frame(ventana)
+    frame_recuperar.pack()
 
-        label_correo = QLabel("Correo:")
-        self.entry_correo = QLineEdit()
-        layout.addWidget(label_correo)
-        layout.addWidget(self.entry_correo)
+    ventana.title("Recuperar Contraseña")
+    # Etiquetas y campos de entrada
 
-        label_usuario = QLabel("Usuario:")
-        self.entry_usuario = QLineEdit()
-        layout.addWidget(label_usuario)
-        layout.addWidget(self.entry_usuario)
+    label_correo = tk.Label(frame_recuperar, text="Correo:")
+    label_correo.grid(row=0, column=0, padx=5, pady=5)
+    entry_correo = tk.Entry(frame_recuperar)
+    entry_correo.grid(row=0, column=1, padx=5, pady=5)
 
-        label_clave = QLabel("Contraseña:")
-        self.entry_clave = QLineEdit()
-        self.entry_clave.setEchoMode(QLineEdit.Password)
-        layout.addWidget(label_clave)
-        layout.addWidget(self.entry_clave)
+    # Botón de inicio de sesión
+    boton_login = tk.Button(frame_recuperar, text="Iniciar Sesión", command=inicio)
+    boton_login.grid(row=3, column=1, padx=5, pady=5)
 
-        label_con_clave = QLabel("Confirmar Contraseña:")
-        self.entry_con_clave = QLineEdit()
-        self.entry_con_clave.setEchoMode(QLineEdit.Password)
-        layout.addWidget(label_con_clave)
-        layout.addWidget(self.entry_con_clave)
+    boton_regis = tk.Button(frame_recuperar, text="Registrar Usuario", command=registro)
+    boton_regis.grid(row=3, column=0, padx=5, pady=5)
 
-        boton_regis = QPushButton("Registrar Usuario")
-        boton_regis.clicked.connect(lambda: self.register(self.entry_correo, self.entry_usuario, self.entry_clave, self.entry_con_clave))
-        layout.addWidget(boton_regis)
+    boton_forget = tk.Button(frame_recuperar, text="Recuperar Contraseña", command=recuperar)
+    boton_forget.grid(row=2, column=0, columnspan=2, pady=5)
 
-        boton_login = QPushButton("Iniciar Sesión")
-        boton_login.clicked.connect(self.interfaz_inicio)
-        layout.addWidget(boton_login)
+def interfaz_registro():
 
-        boton_forget = QPushButton("Olvide mi contraseña")
-        boton_forget.clicked.connect(self.interfaz_recuperar)
-        layout.addWidget(boton_forget)
+    def inicio():
+        frame_registro.pack_forget()
+        interfaz_inicio()
 
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+    def registro():
+        if register(entry_correo, entry_usuario, entry_clave, entry_con_clave):
+            frame_registro.pack_forget()
+            interfaz_inicio()
+        else:
+            frame_registro.pack_forget()
+            interfaz_registro()
 
-    def interfaz_inicio(self):
-        self.clear_layout()
+    def recuperar():
+        frame_registro.pack_forget()
+        interfaz_recuperar()
 
-        layout = QVBoxLayout()
+    frame_registro = tk.Frame(ventana)
+    frame_registro.pack()
 
-        label_usuario = QLabel("Usuario:")
-        self.entry_usuario = QLineEdit()
-        layout.addWidget(label_usuario)
-        layout.addWidget(self.entry_usuario)
+    ventana.title("Registro de Usuario")
+    # Etiquetas y campos de entrada
+    label_correo = tk.Label(frame_registro, text="Correo:")
+    label_correo.grid(row=0, column=0, padx=5, pady=5)
+    entry_correo = tk.Entry(frame_registro)
+    entry_correo.grid(row=0, column=1, padx=5, pady=5)
 
-        label_clave = QLabel("Contraseña:")
-        self.entry_clave = QLineEdit()
-        self.entry_clave.setEchoMode(QLineEdit.Password)
-        layout.addWidget(label_clave)
-        layout.addWidget(self.entry_clave)
+    label_usuario = tk.Label(frame_registro, text="Usuario:")
+    label_usuario.grid(row=1, column=0, padx=5, pady=5)
+    entry_usuario = tk.Entry(frame_registro)
+    entry_usuario.grid(row=1, column=1, padx=5, pady=5)
 
-        boton_login = QPushButton("Iniciar Sesión")
-        boton_login.clicked.connect(lambda: self.login(self.entry_usuario, self.entry_clave))
-        layout.addWidget(boton_login)
+    label_clave = tk.Label(frame_registro, text="Contraseña:")
+    label_clave.grid(row=2, column=0, padx=5, pady=5)
+    entry_clave = tk.Entry(frame_registro, show="*") # Oculta la contraseña
+    entry_clave.grid(row=2, column=1, padx=5, pady=5)
 
-        boton_regis = QPushButton("Registrar Usuario")
-        boton_regis.clicked.connect(self.interfaz_registro)
-        layout.addWidget(boton_regis)
+    label_con_clave = tk.Label(frame_registro, text="Confirmar Contraseña:")
+    label_con_clave.grid(row=3, column=0, padx=5, pady=5)
+    entry_con_clave = tk.Entry(frame_registro, show="*") # Oculta la contraseña
+    entry_con_clave.grid(row=3, column=1, padx=5, pady=5)
 
-        boton_forget = QPushButton("Olvide mi contraseña")
-        boton_forget.clicked.connect(self.interfaz_recuperar)
-        layout.addWidget(boton_forget)
+    # Botón de inicio de sesión
+    boton_regis = tk.Button(frame_registro, text="Registrar Usuario", command=registro)
+    boton_regis.grid(row=4, column=0, columnspan=2, pady=5)
 
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+    boton_login = tk.Button(frame_registro, text="Iniciar Sesión", command=inicio)
+    boton_login.grid(row=5, column=0, padx=5, pady=5)
 
-    def clear_layout(self):
-        if self.centralWidget():
-            self.centralWidget().deleteLater()
+    boton_forget = tk.Button(frame_registro, text="Olvide mi contraseña", command=recuperar)
+    boton_forget.grid(row=5, column=1, padx=5, pady=5)
 
-if __name__ == "__main__":
-    app = QApplication([])
-    window = MainWindow()
-    window.show()
-    app.exec()
+def interfaz_inicio():
+
+    def inicio():
+        login(entry_usuario, entry_clave)
+        frame_inicio.pack_forget()
+        interfaz_inicio()
+
+    def registro():
+        frame_inicio.pack_forget()
+        interfaz_registro()
+    
+    def recuperar():
+        frame_inicio.pack_forget()
+        interfaz_recuperar()
+
+    frame_inicio = tk.Frame(ventana)
+    frame_inicio.pack()
+
+    ventana.title("Inicio de Sesión")
+    # Etiquetas y campos de entrada
+    label_usuario = tk.Label(frame_inicio, text="Usuario:")
+    label_usuario.grid(row=0, column=0, padx=5, pady=5)
+    entry_usuario = tk.Entry(frame_inicio)
+    entry_usuario.grid(row=0, column=1, padx=5, pady=5)
+
+    label_clave = tk.Label(frame_inicio, text="Contraseña:")
+    label_clave.grid(row=1, column=0, padx=5, pady=5)
+    entry_clave = tk.Entry(frame_inicio, show="*") # Oculta la contraseña
+    entry_clave.grid(row=1, column=1, padx=5, pady=5)
+
+    # Botón de inicio de sesión
+    boton_login = tk.Button(frame_inicio, text="Iniciar Sesión", command=inicio)
+    boton_login.grid(row=2, column=0, columnspan=2, pady=5)
+
+    boton_regis = tk.Button(frame_inicio, text="Registrar Usuario", command=registro)
+    boton_regis.grid(row=3, column=0, padx=5, pady=5)
+
+    boton_forget = tk.Button(frame_inicio, text="Olvide mi contraseña", command=recuperar)
+    boton_forget.grid(row=3, column=1, padx=5, pady=5)
+
+interfaz_inicio()
+ventana.mainloop()

@@ -7,7 +7,7 @@ import conexion
 class BuscarImplementos:
     def __init__(self, contenedor):
         self.frame = tk.Frame(contenedor, bg="gray")
-        self.frame.pack(fill="both", expand=True)
+        self.frame.pack(fill="both", expand=True, padx=20, pady=20)
 
         label_busca = tk.Label(self.frame, bg="#D3D3D3")
         label_busca.grid(row=0, column=0, padx=10, pady=10)

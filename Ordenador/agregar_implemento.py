@@ -5,74 +5,66 @@ import conexion
 
 class AgregarImplemento:
     def __init__(self, contenedor):
-        self.frame = tk.Frame(contenedor, bg="#D3D3D3")
+        self.frame = tk.Frame(contenedor, bg="gray")
         self.frame.pack(fill="both", expand=True, padx=20, pady=20)
 
+        label_registro = tk.Label(self.frame, bg="#D3D3D3")
+        label_registro.grid(row=0, column=0, padx=10, pady=10)
+
         # Título
-        titulo = tk.Label(self.frame, text="Registro de Implemento", font=("Arial", 16, "bold"), 
-                         fg="blue", bg="#D3D3D3")
+        titulo = tk.Label(label_registro, text="Registro de Implemento", font=("Arial", 16, "bold"), fg="blue", bg="#D3D3D3")
         titulo.grid(row=0, column=0, columnspan=2, pady=(0, 20))
 
         # Formulario
-        self.crear_formulario()
+        label_campos = tk.Label(label_registro, bg="#D3D3D3")
+        label_campos.grid(row=1, column=0, columnspan=2, pady=(0, 20))
+
+        tk.Label(label_campos, text="Nombre del implemento:", bg="#D3D3D3", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        self.nombre_implemento = tk.Entry(label_campos, font=("Arial", 10))
+        self.nombre_implemento.grid(row=0, column=1, sticky="ew", padx=10, pady=5)
+
+        # Stock
+        tk.Label(label_campos, text="Stock:", bg="#D3D3D3", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        self.stock = tk.Entry(label_campos, font=("Arial", 10))
+        self.stock.grid(row=1, column=1, sticky="ew", padx=10, pady=5)
+
+        # Stock mínimo
+        tk.Label(label_campos, text="Stock mínimo:", bg="#D3D3D3", font=("Arial", 10)).grid(row=2, column=0, sticky="w", padx=10, pady=5)
+        self.stock_minimo = tk.Entry(label_campos, font=("Arial", 10))
+        self.stock_minimo.grid(row=2, column=1, sticky="ew", padx=10, pady=5)
+
+        # Foto
+        tk.Label(label_campos, text="Enlace a Foto del implemento:", bg="#D3D3D3", font=("Arial", 10)).grid(row=3, column=0, sticky="w", padx=10, pady=5)
+        self.foto = tk.Entry(label_campos, font=("Arial", 10))
+        self.foto.grid(row=3, column=1, sticky="ew", padx=10, pady=5)
+
+        # Ubicación (Combobox)
+        tk.Label(label_campos, text="Ubicación:", bg="#D3D3D3", font=("Arial", 10)).grid(row=4, column=0, sticky="w", padx=10, pady=5)
+        self.ubicacion = ttk.Combobox(label_campos, font=("Arial", 10), state="readonly")
+        self.ubicacion.grid(row=4, column=1, sticky="ew", padx=10, pady=5)
+
+        # Unidad de medida (Combobox)
+        tk.Label(label_campos, text="Unidad de Medida:", bg="#D3D3D3", font=("Arial", 10)).grid(row=5, column=0, sticky="w", padx=10, pady=5)
+        self.unidad_medida = ttk.Combobox(label_campos, font=("Arial", 10), state="readonly")
+        self.unidad_medida.grid(row=5, column=1, sticky="ew", padx=10, pady=5)
+
+        # Ficha técnica
+        tk.Label(label_campos, text="Ficha técnica:", bg="#D3D3D3", font=("Arial", 10)).grid(row=6, column=0, sticky="w", padx=10, pady=5)
+        self.ficha_tecnica = tk.Entry(label_campos, font=("Arial", 10))
+        self.ficha_tecnica.grid(row=6, column=1, sticky="ew", padx=10, pady=5)
+
+        # Guía de uso
+        tk.Label(label_campos, text="Guía de Uso:", bg="#D3D3D3", font=("Arial", 10)).grid(row=7, column=0, sticky="w", padx=10, pady=5)
+        self.guia_uso = tk.Entry(label_campos, font=("Arial", 10))
+        self.guia_uso.grid(row=7, column=1, sticky="ew", padx=10, pady=5)
 
         # Botón de registro
-        btn_registrar = tk.Button(self.frame, text="Registrar", command=self.registrar_implemento,
-                                 bg="#007bff", fg="white", font=("Arial", 12))
-        btn_registrar.grid(row=8, column=0, columnspan=2, pady=20)
+        btn_registrar = tk.Button(label_registro, text="Registrar", command=self.registrar_implemento, bg="#007bff", fg="white", font=("Arial", 12))
+        btn_registrar.grid(row=2, column=0, columnspan=2, pady=20)
 
         # Cargar opciones de combobox
         self.cargar_ubicaciones()
         self.cargar_unidades_medida()
-
-    def crear_formulario(self):
-        # Nombre del implemento
-        tk.Label(self.frame, text="Nombre del implemento:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10, pady=5)
-        self.nombre_implemento = tk.Entry(self.frame, font=("Arial", 10))
-        self.nombre_implemento.grid(row=1, column=1, sticky="ew", padx=10, pady=5)
-
-        # Stock
-        tk.Label(self.frame, text="Stock:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=2, column=0, sticky="w", padx=10, pady=5)
-        self.stock = tk.Entry(self.frame, font=("Arial", 10))
-        self.stock.grid(row=2, column=1, sticky="ew", padx=10, pady=5)
-
-        # Stock mínimo
-        tk.Label(self.frame, text="Stock mínimo:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=3, column=0, sticky="w", padx=10, pady=5)
-        self.stock_minimo = tk.Entry(self.frame, font=("Arial", 10))
-        self.stock_minimo.grid(row=3, column=1, sticky="ew", padx=10, pady=5)
-
-        # Foto
-        tk.Label(self.frame, text="Enlace a Foto del implemento:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=4, column=0, sticky="w", padx=10, pady=5)
-        self.foto = tk.Entry(self.frame, font=("Arial", 10))
-        self.foto.grid(row=4, column=1, sticky="ew", padx=10, pady=5)
-
-        # Ubicación (Combobox)
-        tk.Label(self.frame, text="Ubicación:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=5, column=0, sticky="w", padx=10, pady=5)
-        self.ubicacion = ttk.Combobox(self.frame, font=("Arial", 10), state="readonly")
-        self.ubicacion.grid(row=5, column=1, sticky="ew", padx=10, pady=5)
-
-        # Unidad de medida (Combobox)
-        tk.Label(self.frame, text="Unidad de Medida:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=6, column=0, sticky="w", padx=10, pady=5)
-        self.unidad_medida = ttk.Combobox(self.frame, font=("Arial", 10), state="readonly")
-        self.unidad_medida.grid(row=6, column=1, sticky="ew", padx=10, pady=5)
-
-        # Ficha técnica
-        tk.Label(self.frame, text="Ficha técnica:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=7, column=0, sticky="w", padx=10, pady=5)
-        self.ficha_tecnica = tk.Entry(self.frame, font=("Arial", 10))
-        self.ficha_tecnica.grid(row=7, column=1, sticky="ew", padx=10, pady=5)
-
-        # Guía de uso
-        tk.Label(self.frame, text="Guía de Uso:", bg="#D3D3D3", 
-                font=("Arial", 10)).grid(row=8, column=0, sticky="w", padx=10, pady=5)
-        self.guia_uso = tk.Entry(self.frame, font=("Arial", 10))
-        self.guia_uso.grid(row=8, column=1, sticky="ew", padx=10, pady=5)
 
     def cargar_ubicaciones(self):
         try:

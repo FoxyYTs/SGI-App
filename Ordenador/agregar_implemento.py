@@ -104,10 +104,17 @@ class AgregarImplemento:
         unidad_medida = self.unidad_medida.get().split()[0]  # Obtener solo el ID
         ficha_tecnica = self.ficha_tecnica.get()
         guia_uso = self.guia_uso.get()
-
         # Validaciones básicas
         if not nombre:
             messagebox.showerror("Error", "El nombre del implemento es requerido")
+            return
+
+        if not ubicacion:
+            messagebox.showerror("Error", "La ubicación del implemento es requerida")
+            return
+
+        if not unidad_medida:
+            messagebox.showerror("Error", "La unidad de medida del implemento es requerida")
             return
 
         try:

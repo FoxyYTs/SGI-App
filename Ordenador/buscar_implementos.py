@@ -38,7 +38,19 @@ class BuscarImplementos:
         self.tree.heading("stock", text="Stock")
         self.tree.heading("ubicacion", text="Ubicación")
         self.tree.heading("unidadmedida", text="Unidad de Medida")
-        self.tree.grid(row=2, column=0, padx=10, pady=10)
+
+        self.tree.column("id_implemento", width=10, stretch=True)  # Columna ID con ancho mínimo 10
+        self.tree.column("nombre_implemento", width=150, stretch=True)  # Se ajustará al espacio disponible
+        self.tree.column("stock", width=50, stretch=True)
+        self.tree.column("ubicacion", width=100, stretch=True)
+        self.tree.column("unidadmedida", width=100, stretch=True)
+
+        # Hacer que el Treeview se expanda con la ventana
+        self.tree.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+
+        # Configurar el peso de la fila y columna para que se expanda
+        self.frame.grid_rowconfigure(2, weight=1)  # Fila donde está el Treeview
+        self.frame.grid_columnconfigure(0, weight=1)  # Columna donde está el Treeview
         self.tree.bind("<<TreeviewSelect>>", self.seleccionar_fila)
 
         self.gestion = tk.Frame(self.frame, bg="#D3D3D3")

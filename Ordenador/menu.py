@@ -8,6 +8,7 @@ import conexion
 
 from buscar_implementos import BuscarImplementos
 from agregar_implemento import AgregarImplemento
+from generar_informe import GenerarInforme
 
 class Menu:
     def __init__(self, user):
@@ -80,7 +81,7 @@ class Menu:
         elif data == "AGREGAR IMPLEMENTOS":
             AgregarImplemento(self.contenedor)
         elif data == "GENERAR INFORME":
-            self.generar_informe()
+            GenerarInforme(self.contenedor)
         elif data == "GESTIONAR ROLES":
             self.gestionar_roles()
         elif data == "GESTIONAR IMPLEMENTOS":

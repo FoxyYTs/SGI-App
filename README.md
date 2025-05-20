@@ -29,3 +29,7 @@ La aplicación de escritorio SGI LAB MANAGER está desarrollada en:
     * [GitHub](https://github.com/FoxyYTs)
     * [LinkedIn](https://www.linkedin.com/in/jose-andres-daza-gallego/)
     * [Portafolio](https://foxyyts.github.io/gitprofile/)
+
+## 📜 Licencia
+
+Este proyecto está bajo la Licencia MIT. Para más detalles, consulta el archivo [LICENSE](LICENSE) en este repositorio.

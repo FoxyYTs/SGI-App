@@ -32,4 +32,6 @@ La aplicación de escritorio SGI LAB MANAGER está desarrollada en:
 
 ## 📜 Licencia
 
-Este proyecto está bajo la Licencia MIT. Para más detalles, consulta el archivo [LICENSE](LICENSE) en este repositorio.
+Copyright © 2025 Jose Andres Daza Gallego, Ana María Gómez Soto. Todos los derechos reservados.
+
+No se permite la copia, modificación, distribución o uso de este software sin el permiso explícito de los autores.

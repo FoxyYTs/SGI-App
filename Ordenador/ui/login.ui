@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SGI</class>
- <widget class="QMainWindow" name="SGI">
+ <class>SGI_Login</class>
+ <widget class="QMainWindow" name="SGI_Login">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -38,6 +38,63 @@
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
+      <widget class="QWidget" name="inicio">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>1</number>
+        </property>
+        <property name="leftMargin">
+         <number>50</number>
+        </property>
+        <property name="topMargin">
+         <number>50</number>
+        </property>
+        <property name="rightMargin">
+         <number>50</number>
+        </property>
+        <property name="bottomMargin">
+         <number>50</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="line_inicio_usuario">
+          <property name="placeholderText">
+           <string>Usuario</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="line_inicio_clave">
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>Contraseña</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_inicio_iniciar">
+          <property name="text">
+           <string>Iniciar Sesion</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_inicio_registrar">
+          <property name="text">
+           <string>Crear Cuenta</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_inicio_recuperar">
+          <property name="text">
+           <string>Olvide Mi Contraseña</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="registro">
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="leftMargin">
@@ -94,63 +151,6 @@
          <widget class="QPushButton" name="btn_registro_iniciar">
           <property name="text">
            <string>Ya Tengo una Cuenta</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="inicio_2">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="spacing">
-         <number>6</number>
-        </property>
-        <property name="leftMargin">
-         <number>50</number>
-        </property>
-        <property name="topMargin">
-         <number>50</number>
-        </property>
-        <property name="rightMargin">
-         <number>50</number>
-        </property>
-        <property name="bottomMargin">
-         <number>50</number>
-        </property>
-        <item>
-         <widget class="QLineEdit" name="line_inicio_usuario">
-          <property name="placeholderText">
-           <string>Usuario</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="line_inicio_clave">
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Contraseña</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_inicio_iniciar">
-          <property name="text">
-           <string>Iniciar Sesion</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_inicio_registrar">
-          <property name="text">
-           <string>Crear Cuenta</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_inicio_recuperar">
-          <property name="text">
-           <string>Olvide Mi Contraseña</string>
           </property>
          </widget>
         </item>

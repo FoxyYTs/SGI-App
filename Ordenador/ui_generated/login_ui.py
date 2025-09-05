@@ -23,7 +23,7 @@ class Ui_SGI_Login(object):
     def setupUi(self, SGI_Login):
         if not SGI_Login.objectName():
             SGI_Login.setObjectName(u"SGI_Login")
-        SGI_Login.resize(900, 700)
+        SGI_Login.resize(600, 700)
         self.centralwidget = QWidget(SGI_Login)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)

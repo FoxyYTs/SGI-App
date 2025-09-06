@@ -78,6 +78,7 @@ def register(conexion, funciones_utiles, correo, usuario, clave, con_clave):
         return False
 
 def recover(conexion, funciones_utiles, correo):
+    print("Hola ", correo)
     if comprobar_campo("recover", correo):
         return False
     if not re.match(expRegCorreo, correo):

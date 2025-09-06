@@ -3,9 +3,9 @@ import mysql.connector
 def conectar():  # Nombre más descriptivo
     try:
         mydb = mysql.connector.connect(
-            host="10.144.253.101",
-            user="sgi",
-            passwd="M6NyZMpYE7i62b",
+            host="172.22.85.242",
+            user="sgi_user",
+            passwd="clave_sgi_app",
             database="sgi"
         )
         return mydb

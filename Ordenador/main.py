@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
 
     def recover(self):
         correo = self.ui.line_recupero_correo.text()
-        
+        print(correo)
         auth_recover(self.conexion, self.f, correo)
 
     # ========== Navegación ==========

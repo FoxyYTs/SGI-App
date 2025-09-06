@@ -95,6 +95,7 @@ class Ui_SGI_Login(object):
 
         self.line_registro_reclave = QLineEdit(self.registro)
         self.line_registro_reclave.setObjectName(u"line_registro_reclave")
+        self.line_registro_reclave.setEchoMode(QLineEdit.Password)
 
         self.verticalLayout.addWidget(self.line_registro_reclave)
 

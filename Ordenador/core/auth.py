@@ -58,14 +58,14 @@ def register(conexion, funciones_utiles, correo, usuario, clave, con_clave):
     try:
         mycursor = conexion.cursor()
         
-        sql = "SELECT * FROM acceso WHERE user = %s OR email = %s"
+        sql = "SELECT * FROM usuario WHERE user = %s OR email = %s"
         val = (usuario, correo)
         mycursor.execute(sql, val)
         if mycursor.fetchone():
             QMessageBox.critical(None, "Error", "El usuario o correo ya existen.")
             return False
 
-        sql = "INSERT INTO acceso (email, user, pass) VALUES (%s, %s, %s)"
+        sql = "INSERT INTO usuario (email, user, pass) VALUES (%s, %s, %s)"
         val = (correo, usuario, pass_encriptada)
         mycursor.execute(sql, val)
         conexion.commit()

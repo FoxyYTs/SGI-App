@@ -7,3 +7,4 @@ __pycache__/
 .DS_Store
 .env
 Ordenador/conexion.py
+Ordenador/core/conexion.py
